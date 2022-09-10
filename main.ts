@@ -220,6 +220,7 @@ export class BulkRenameSettingsTab extends PluginSettingTab {
     this.filesAndPreview = new Setting(this.containerEl);
     this.totalFiles = this.containerEl.createEl('span', {
       text: `Total Files: ${this.plugin.settings.fileNames.length}`,
+      cls: 'bulk_total',
     });
 
     this.filesAndPreview.infoEl.style.display = 'none';

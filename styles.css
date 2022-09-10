@@ -10,6 +10,11 @@
   width: 100%;
 }
 
+.bulk_total {
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
 .bulk_preview_header {
   margin-top: 5px;
   margin-bottom: 5px;
