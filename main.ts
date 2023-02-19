@@ -18,13 +18,18 @@ import {
 } from './src/services/obsidian.service';
 import { renderPreviewFiles } from './src/components/RenderPreviewFiles';
 import { createBackslash } from './src/components/RegExpBackslash';
-import { RegExpFlag } from './src/constants/RegExpFlags';
 import { RegExpFlagsSuggest } from './src/suggestions/RegExpFlagsSuggest';
 import {
   isViewTypeRegExp,
   isViewTypeFolder,
   isViewTypeTags,
 } from './src/services/settings.service';
+import {
+  REGEXP_PRESETS,
+  RegExpPresets,
+  RegExpFlag,
+  REGEXP_PRESETS_OPTIONS,
+} from './src/domain/RegExp';
 
 export interface BulkRenamePluginSettings {
   folderName: string;
@@ -36,6 +41,7 @@ export interface BulkRenamePluginSettings {
     regExp: string;
     withRegExpForReplaceSymbols: boolean;
     flags: RegExpFlag[];
+    preset: RegExpPresets;
   };
   viewType: 'tags' | 'folder' | 'regexp';
 }
@@ -49,6 +55,7 @@ const DEFAULT_SETTINGS: BulkRenamePluginSettings = {
     regExp: '',
     flags: [],
     withRegExpForReplaceSymbols: false,
+    preset: REGEXP_PRESETS.custom,
   },
   tags: [],
   viewType: 'folder',
@@ -112,6 +119,7 @@ export class BulkRenameSettingsTab extends PluginSettingTab {
     this.renderTagNames();
     this.renderRegExpInput();
     this.renderReplaceSymbol();
+    this.renderReplacePresents();
     this.renderFilesAndPreview();
     this.renderRenameFiles();
     this.renderSupportDevelopment();
@@ -323,6 +331,44 @@ export class BulkRenameSettingsTab extends PluginSettingTab {
       });
       textComponent.inputEl.addClass('bulk_input');
       textComponent.inputEl.onblur = this.reRenderPreview;
+    });
+  }
+
+  renderReplacePresents() {
+    if (!isViewTypeRegExp(this.plugin.settings)) {
+      return;
+    }
+
+    const { settings } = this.plugin;
+    const newSettings = new Setting(this.containerEl);
+
+    newSettings.setName('RegExp Presets');
+    newSettings.setDesc(settings.regExpState.preset.description);
+    newSettings.addDropdown((dropdown) => {
+      console.log(REGEXP_PRESETS_OPTIONS);
+      dropdown.addOptions(REGEXP_PRESETS_OPTIONS);
+      dropdown.setValue(settings.regExpState.preset.value);
+
+      dropdown.onChange((value) => {
+        if (!settings.regExpState.withRegExpForReplaceSymbols) {
+          settings.regExpState.withRegExpForReplaceSymbols = true;
+        }
+
+        if (value === REGEXP_PRESETS.dateReplacement.value) {
+          settings.existingSymbol = REGEXP_PRESETS.dateReplacement.regExp;
+          settings.replacePattern = REGEXP_PRESETS.dateReplacement.pattern;
+          settings.regExpState.preset = REGEXP_PRESETS.dateReplacement;
+        }
+
+        if (value === REGEXP_PRESETS.custom.value) {
+          settings.existingSymbol = REGEXP_PRESETS.custom.regExp;
+          settings.replacePattern = REGEXP_PRESETS.custom.pattern;
+          settings.regExpState.preset = REGEXP_PRESETS.custom;
+        }
+
+        this.plugin.saveSettings();
+        this.display();
+      });
     });
   }
 

@@ -1,7 +1,7 @@
 // Credits go to Liam's Periodic Notes Plugin: https://github.com/liamcain/obsidian-periodic-notes
 
 import { TextInputSuggest } from './suggest';
-import { REGEXP_FLAGS, RegExpFlag } from '../constants/RegExpFlags';
+import { REGEXP_FLAGS, RegExpFlag } from '../domain/RegExp';
 
 export class RegExpFlagsSuggest extends TextInputSuggest<RegExpFlag> {
   // @ts-ignore TODO refactor types
